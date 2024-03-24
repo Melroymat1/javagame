@@ -13,12 +13,10 @@ public class JumbledNumbersGame extends JFrame {
     private Timer timer;
     private int secondsPassed;
     private String playerName;
-    private int round;
 
     public JumbledNumbersGame(String playerName) {
         this.playerName = playerName;
         this.tiles = new Integer[size * size];
-        this.round = 1; // Initialize round to 1
         initializeTiles();
         createUI();
         startTimer();
@@ -44,7 +42,8 @@ public class JumbledNumbersGame extends JFrame {
             for (int j = 0; j < size; j++) {
                 final int row = i;
                 final int col = j;
-                JButton button = new JButton(tiles[i * size + j] != null ? tiles[i * size + j].toString() : "");
+                int number = tiles[i * size + j] != null ? tiles[i * size + j] : 0; // Ensure numbers are between 1 and 8
+                JButton button = new JButton(number != 0 ? String.valueOf(number) : "");
                 button.setBackground(Color.white); // Change button background color
                 button.setPreferredSize(new Dimension(80, 80)); // Adjust button size
                 button.addActionListener(new ActionListener() {
@@ -87,17 +86,8 @@ public class JumbledNumbersGame extends JFrame {
             updateUI();
             if (isGameFinished()) {
                 timer.stop();
-                if (round == 1) {
-                    JOptionPane.showMessageDialog(this, "Congratulations, " + playerName + "! You've solved the puzzle in " + secondsPassed + " seconds. Press Enter to start Round 2.");
-                    round++;
-                    timerLabel.setText("Press Enter to start Round 2");
-                } else if (round == 2) {
-                    JOptionPane.showMessageDialog(this, "Congratulations, " + playerName + "! You've completed Round 2. Press Enter to start Round 3.");
-                    round++;
-                    timerLabel.setText("Press Enter to start Round 3");
-                } else if (round == 3) {
-                    JOptionPane.showMessageDialog(this, "Congratulations, " + playerName + "! You've completed Round 3.");
-                }
+                JOptionPane.showMessageDialog(this, "Congratulations, " + playerName + "! You've solved the puzzle in " + secondsPassed + " seconds.");
+                System.exit(0);
             }
         }
     }
@@ -127,14 +117,7 @@ public class JumbledNumbersGame extends JFrame {
     private void startTimer() {
         int initialDelay = 0;
         int period = 1000;
-        final int totalTime;
-        if (round == 2) {
-            totalTime = 180; // Increase time for round 2 (3 minutes)
-        } else if (round == 3) {
-            totalTime = 240; // Increase time for round 3 (4 minutes)
-        } else {
-            totalTime = 4; // Initial time for round 1 (2 minutes)
-        }
+        final int totalTime = 120; // Total time for round (4 minutes)
 
         timer = new Timer(period, new ActionListener() {
             @Override
@@ -143,21 +126,8 @@ public class JumbledNumbersGame extends JFrame {
                 timerLabel.setText("Time: " + secondsPassed + " seconds");
                 if (secondsPassed >= totalTime) {
                     timer.stop();
-                    if (round == 1) {
-                        int option = JOptionPane.showConfirmDialog(JumbledNumbersGame.this, "Time's up ! Do you want to try again?", "Time's Up", JOptionPane.YES_NO_OPTION);
-                        if (option == JOptionPane.YES_OPTION) {
-                            resetGame();
-                        } else {
-                            System.exit(0);
-                        }
-                    } else {
-                        int option = JOptionPane.showConfirmDialog(JumbledNumbersGame.this, "Time's up! Do you want to try again?", "Time's Up", JOptionPane.YES_NO_OPTION);
-                        if (option == JOptionPane.YES_OPTION) {
-                            resetGame();
-                        } else {
-                            System.exit(0);
-                        }
-                    }
+                    JOptionPane.showMessageDialog(JumbledNumbersGame.this, "Time's up! Try again.");
+                    resetGame();
                 }
             }
         });
@@ -173,48 +143,27 @@ public class JumbledNumbersGame extends JFrame {
         }
         return true;
     }
+
     private void resetGame() {
-        int option;
-        if (round == 1) {
-            option = JOptionPane.showConfirmDialog(this, "Time's up! Do you want to try again?", "Time's Up", JOptionPane.YES_NO_OPTION);
-        } else {
-            option = JOptionPane.showConfirmDialog(this, "Time's up! Do you want to try again?", "Time's Up", JOptionPane.YES_NO_OPTION);
-        }
-        if (option == JOptionPane.YES_OPTION) {
-            round++;
-            int newSize = (round == 1) ? 3 : 4;
-            Integer[] newTiles = new Integer[newSize * newSize];
-            for (int i = 0; i < newSize * newSize - 1; i++) {
-                newTiles[i] = i + 1;
-            }
-            newTiles[newSize * newSize - 1] = null; // represents empty space
-            Collections.shuffle(Arrays.asList(newTiles)); // Shuffle tiles again
-            this.tiles = newTiles;
-            this.secondsPassed = 0;
-            this.timerLabel.setText("Time: 0 seconds");
-            
-            // Reset the timer
-            timer.stop();
-            startTimer();
-    
-            updateUI();
-        } else {
-            System.exit(0);
-        }
+        initializeTiles();
+        this.secondsPassed = 0;
+        this.timerLabel.setText("Time: 0 seconds");
+
+        // Reset the timer
+        timer.stop();
+        startTimer();
+
+        updateUI();
     }
-    
-    
-    
-    
+
     public static void main(String[] args) {
-        final String playerName =JOptionPane.showInputDialog("Enter your name:");
+        final String playerName = JOptionPane.showInputDialog("Enter your name:");
         if (playerName == null || playerName.trim().isEmpty()) {
             return;
         }
-        
+
         SwingUtilities.invokeLater(() -> {
             new JumbledNumbersGame(playerName);
         });
     }
 }
-
