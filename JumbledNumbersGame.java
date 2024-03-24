@@ -192,14 +192,10 @@ public class JumbledNumbersGame extends JFrame {
             this.tiles = newTiles;
             this.secondsPassed = 0;
             this.timerLabel.setText("Time: 0 seconds");
-    
-            if (timer != null && timer.isRunning() && round == 1) {
-                timer.stop();
-            }
-    
-            if (round == 1) {
-                startTimer();
-            }
+            
+            // Reset the timer
+            timer.stop();
+            startTimer();
     
             updateUI();
         } else {
