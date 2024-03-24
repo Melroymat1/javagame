@@ -7,15 +7,16 @@ import java.util.Collections;
 
 public class JumbledNumbersGame extends JFrame {
     private JButton[][] buttons;
-    private final int size = 3; // Fixed size as 3x3 matrix
     private Integer[] tiles;
     private JLabel timerLabel;
     private Timer timer;
     private int secondsPassed;
     private String playerName;
+    private int size;
 
-    public JumbledNumbersGame(String playerName) {
+    public JumbledNumbersGame(String playerName, int size) {
         this.playerName = playerName;
+        this.size = size;
         this.tiles = new Integer[size * size];
         initializeTiles();
         createUI();
@@ -42,10 +43,10 @@ public class JumbledNumbersGame extends JFrame {
             for (int j = 0; j < size; j++) {
                 final int row = i;
                 final int col = j;
-                int number = tiles[i * size + j] != null ? tiles[i * size + j] : 0; // Ensure numbers are between 1 and 8
+                int number = tiles[i * size + j] != null ? tiles[i * size + j] : 0;
                 JButton button = new JButton(number != 0 ? String.valueOf(number) : "");
-                button.setBackground(Color.white); // Change button background color
-                button.setPreferredSize(new Dimension(80, 80)); // Adjust button size
+                button.setBackground(Color.white);
+                button.setPreferredSize(new Dimension(80, 80));
                 button.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         moveTile(row, col);
@@ -62,7 +63,7 @@ public class JumbledNumbersGame extends JFrame {
         add(timerLabel, BorderLayout.NORTH);
         add(panel, BorderLayout.CENTER);
         setTitle("Jumbled Numbers Game");
-        setSize(400, 400); // Adjust game window size
+        setSize(100 * size, 100 * size);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setVisible(true);
@@ -117,7 +118,7 @@ public class JumbledNumbersGame extends JFrame {
     private void startTimer() {
         int initialDelay = 0;
         int period = 1000;
-        final int totalTime = 120; // Total time for round (4 minutes)
+        final int totalTime = size == 3 ? 120 : 240; // Total time for 3x3 (2 minutes) and 4x4 (4 minutes)
 
         timer = new Timer(period, new ActionListener() {
             @Override
@@ -162,8 +163,12 @@ public class JumbledNumbersGame extends JFrame {
             return;
         }
 
+        String[] options = {"3x3 Matrix", "4x4 Matrix"};
+        int choice = JOptionPane.showOptionDialog(null, "Choose matrix size", "Matrix Size", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+        int size = (choice == 0) ? 3 : 4;
+
         SwingUtilities.invokeLater(() -> {
-            new JumbledNumbersGame(playerName);
+            new JumbledNumbersGame(playerName, size);
         });
     }
 }
