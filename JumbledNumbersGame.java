@@ -7,7 +7,7 @@ import java.util.Collections;
 
 public class JumbledNumbersGame extends JFrame {
     private JButton[][] buttons;
-    private final int size; // Declaring size as final
+    private final int size = 3; // Fixed size as 3x3 matrix
     private Integer[] tiles;
     private JLabel timerLabel;
     private Timer timer;
@@ -15,10 +15,9 @@ public class JumbledNumbersGame extends JFrame {
     private String playerName;
     private int round;
 
-    public JumbledNumbersGame(int size, String playerName) {
-        this.size = size;
-        this.tiles = new Integer[size * size];
+    public JumbledNumbersGame(String playerName) {
         this.playerName = playerName;
+        this.tiles = new Integer[size * size];
         this.round = 1; // Initialize round to 1
         initializeTiles();
         createUI();
@@ -134,7 +133,7 @@ public class JumbledNumbersGame extends JFrame {
         } else if (round == 3) {
             totalTime = 240; // Increase time for round 3 (4 minutes)
         } else {
-            totalTime = 120; // Initial time for round 1 (2 minutes)
+            totalTime = 4; // Initial time for round 1 (2 minutes)
         }
 
         timer = new Timer(period, new ActionListener() {
@@ -174,68 +173,52 @@ public class JumbledNumbersGame extends JFrame {
         }
         return true;
     }
-
     private void resetGame() {
-        round++;
-        int gameSize = 3; // Default game size
-        if (round == 2) {
-            gameSize = 4; // Change to 4x4 for round 2
-        } else if (round == 3) {
-            gameSize = 5; // Change to 5x5 for round 3
+        int option;
+        if (round == 1) {
+            option = JOptionPane.showConfirmDialog(this, "Time's up! Do you want to try again?", "Time's Up", JOptionPane.YES_NO_OPTION);
+        } else {
+            option = JOptionPane.showConfirmDialog(this, "Time's up! Do you want to try again?", "Time's Up", JOptionPane.YES_NO_OPTION);
         }
-        int newSize = gameSize * gameSize;
-        Integer[] newTiles = new Integer[newSize];
-        for
-        (int i = 0; i < Math.min(newSize, tiles.length); i++) {
-            newTiles[i] = tiles[i];
-        }
-        this.tiles = newTiles;
-        // Remove the following line since size is final and cannot be reassigned
-        // this.size = gameSize;
-        initializeTiles();
-        this.secondsPassed = 0;
-        this.timerLabel.setText("Time: 0 seconds");
+        if (option == JOptionPane.YES_OPTION) {
+            round++;
+            int newSize = (round == 1) ? 3 : 4;
+            Integer[] newTiles = new Integer[newSize * newSize];
+            for (int i = 0; i < newSize * newSize - 1; i++) {
+                newTiles[i] = i + 1;
+            }
+            newTiles[newSize * newSize - 1] = null; // represents empty space
+            Collections.shuffle(Arrays.asList(newTiles)); // Shuffle tiles again
+            this.tiles = newTiles;
+            this.secondsPassed = 0;
+            this.timerLabel.setText("Time: 0 seconds");
     
-        // Stop the old timer if it's running
-        if (timer != null && timer.isRunning()) {
-            timer.stop();
-        }
+            if (timer != null && timer.isRunning() && round == 1) {
+                timer.stop();
+            }
     
-        startTimer(); // Start a new timer
-        updateUI(); // Update UI with new game size and tiles
+            if (round == 1) {
+                startTimer();
+            }
+    
+            updateUI();
+        } else {
+            System.exit(0);
+        }
     }
     
     
-
+    
+    
     public static void main(String[] args) {
-        final String playerName = JOptionPane.showInputDialog("Enter your name:");
+        final String playerName =JOptionPane.showInputDialog("Enter your name:");
         if (playerName == null || playerName.trim().isEmpty()) {
             return;
         }
         
-        Object[] options = {"3x3 Matrix", "4x4 Matrix", "5x5 Matrix"};
-        int choice = JOptionPane.showOptionDialog(null, "Select Matrix Size", "Matrix Size", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
-        
-        int size;
-        switch (choice) {
-            case 0:
-                size = 3;
-                break;
-            case 1:
-                size = 4;
-                break;
-            case 2:
-                size = 5;
-                break;
-            default:
-                size = 3; // Default to 3x3 matrix if no option is chosen
-                break;
-        }
-        
         SwingUtilities.invokeLater(() -> {
-            new JumbledNumbersGame(size, playerName);
+            new JumbledNumbersGame(playerName);
         });
     }
-    
-}    
+}
 
