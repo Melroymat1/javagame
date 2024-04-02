@@ -6,6 +6,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Arrays;//can handle oporations on array
 import java.util.Collections;//to shuffle the elements in java//
+import java.awt.event.WindowEvent;
+
 
 
 public class JumbledNumbersGame extends JFrame {
@@ -127,7 +129,7 @@ public class JumbledNumbersGame extends JFrame {
     private void startTimer() {
         int initialDelay = 0;
         int period = 1000;
-        final int totalTime = size == 3 ? 10 : 20; // Total time for 3x3 (10 seconds) and 4x4 (20 seconds)
+        final int totalTime = size == 3 ? 120 : 240; // Total time for 3x3 (10 seconds) and 4x4 (20 seconds)
     
         timer = new Timer(period, new ActionListener() {
             @Override
@@ -154,7 +156,17 @@ public class JumbledNumbersGame extends JFrame {
         timer.start();
     }
     
-    
+    @Override
+protected void processWindowEvent(WindowEvent e) {
+    if (e.getID() == WindowEvent.WINDOW_CLOSING) {
+        int confirm = JOptionPane.showConfirmDialog(this, "Are you sure you want to quit the game?", "Quit Game", JOptionPane.YES_NO_OPTION);
+        if (confirm == JOptionPane.YES_OPTION) {
+            System.exit(0);
+        }
+    }
+    super.processWindowEvent(e);
+}
+
 
     private boolean isGameFinished() {
         for (int i = 0; i < size * size - 1; i++) {
@@ -171,6 +183,9 @@ public class JumbledNumbersGame extends JFrame {
         this.timerLabel.setText("Time: 0 seconds");
         updateUI();
         startTimer();
+
+    
+
     }
  
     
@@ -183,9 +198,9 @@ public class JumbledNumbersGame extends JFrame {
         UIManager.put("Button.background", Color.yellow);
         UIManager.put("Button.foreground", Color.black);
         UIManager.put("Button.font", new Font("Times New Roman", Font.BOLD, 16));
-
+    
         String[] playerNameHolder = new String[1]; // A holder array to store playerName
-
+    
         while (true) {
             String playerName = JOptionPane.showInputDialog(null, "Enter your name:", "Player Name", JOptionPane.PLAIN_MESSAGE);
             if (playerName == null || playerName.trim().isEmpty()) {
@@ -199,16 +214,31 @@ public class JumbledNumbersGame extends JFrame {
                 break; // Break the loop if playerName is not empty
             }
         }
-
-        String[] options = {"3x3 Matrix", "4x4 Matrix"};
+    
+        String[] options = {"3x3 Matrix", "4x4 Matrix", "5x5 Matrix", "6x6 Matrix"};
         int choice = JOptionPane.showOptionDialog(null, "Choose matrix size", "Matrix Size", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
-        int size = (choice == 0) ? 3 : 4;
-
+        int size;
+        switch (choice) {
+            case 0:
+                size = 3;
+                break;
+            case 1:
+                size = 4;
+                break;
+            case 2:
+                size = 5;
+                break;
+            case 3:
+                size = 6;
+                break;
+            default:
+                size = 0; // Default to 4x4 matrix
+        }
+    
         final String playerName = playerNameHolder[0]; // Retrieve playerName from the holder array
-
+    
         SwingUtilities.invokeLater(() -> {
             new JumbledNumbersGame(playerName, size);
         });
     }
-    
 }
